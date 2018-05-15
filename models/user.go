@@ -2,85 +2,82 @@ package models
 
 import (
 	"errors"
-	"strconv"
-	"time"
+	"log"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 var (
-	UserList map[string]*User
+	db         *MongoConnection
+	collection string
 )
 
 func init() {
-	UserList = make(map[string]*User)
-	u := User{"user_11111", "astaxie", "11111", Profile{"male", 20, "Singapore", "astaxie@gmail.com"}}
-	UserList["user_11111"] = &u
+	db = GetMongo()
+	collection = "user"
 }
 
+// User struct
 type User struct {
-	Id       string
-	Username string
-	Password string
-	Profile  Profile
+	ID          bson.ObjectId `bson:"_id" json:"id"`
+	Username    string        `bson:"username" json:"username"`
+	Email       string        `bson:"email" json:"email"`
+	FirstName   string        `bson:"first_name" json:"first_name"`
+	LastName    string        `bson:"last_name" json:"last_name"`
+	Image       string        `bson:"image" json:"image"`
+	SocialMedia []SocialMedia `bson:"social_media" json:"social_media"`
 }
 
-type Profile struct {
-	Gender  string
-	Age     int
-	Address string
-	Email   string
+// SocialMedia struct
+type SocialMedia struct {
+	Name string `bson:"name" json:"name"`
+	Key  string `bson:"key" json:"key"`
+	URL  string `bson:"url" json:"url"`
 }
 
+// AddUser function
 func AddUser(u User) string {
-	u.Id = "user_" + strconv.FormatInt(time.Now().UnixNano(), 10)
-	UserList[u.Id] = &u
-	return u.Id
-}
-
-func GetUser(uid string) (u *User, err error) {
-	if u, ok := UserList[uid]; ok {
-		return u, nil
+	u.ID = bson.NewObjectId()
+	err := db.Insert(collection, u)
+	if err != nil {
+		log.Printf("New User Error:: %v", err)
+		return ""
 	}
-	return nil, errors.New("User not exists")
+	return u.ID.Hex()
 }
 
-func GetAllUsers() map[string]*User {
-	return UserList
-}
-
-func UpdateUser(uid string, uu *User) (a *User, err error) {
-	if u, ok := UserList[uid]; ok {
-		if uu.Username != "" {
-			u.Username = uu.Username
-		}
-		if uu.Password != "" {
-			u.Password = uu.Password
-		}
-		if uu.Profile.Age != 0 {
-			u.Profile.Age = uu.Profile.Age
-		}
-		if uu.Profile.Address != "" {
-			u.Profile.Address = uu.Profile.Address
-		}
-		if uu.Profile.Gender != "" {
-			u.Profile.Gender = uu.Profile.Gender
-		}
-		if uu.Profile.Email != "" {
-			u.Profile.Email = uu.Profile.Email
-		}
-		return u, nil
+// GetUser function
+func GetUser(uid string) (*User, error) {
+	u := &User{}
+	err := db.FindByID(collection, uid).One(&u)
+	if err != nil {
+		log.Printf("Get User error :: %v ", err)
+		return nil, errors.New("User not exists")
 	}
-	return nil, errors.New("User Not Exist")
+	return u, nil
 }
 
-func Login(username, password string) bool {
-	for _, u := range UserList {
-		if u.Username == username && u.Password == password {
-			return true
-		}
+// GetAllUsers function
+func GetAllUsers() []User {
+	users := []User{}
+	err := db.Find(collection, nil).All(&users)
+	if err != nil {
+		log.Printf("User FindAll Error :: %v ", err)
+		return nil
 	}
-	return false
+	return users
 }
 
-func DeleteUser(uid string) {
-	delete(UserList, uid)
+// UpdateUser function
+func UpdateUser(uid string, uu *User) (*User, error) {
+
+	if err := db.UpdateByID(collection, uid, uu); err != nil {
+		log.Printf("Update Error :: %v", err)
+		return nil, errors.New("User Not Exist")
+	}
+	err := db.FindByID(collection, uid).One(&uu)
+	if err != nil {
+		return nil, err
+	}
+	return uu, nil
 }
