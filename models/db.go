@@ -25,8 +25,8 @@ var (
 func GetMongo() *MongoConnection {
 	once.Do(func() {
 		instance = &MongoConnection{
-			ConnectionString: "mongodb://localhost:27017",
-			DatabaseName:     "connect_db",
+			ConnectionString: "mongodb://ds261660.mlab.com:61660",
+			DatabaseName:     "connect-test",
 		}
 		instance.Connect()
 	})

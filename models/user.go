@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -22,6 +23,7 @@ type User struct {
 	ID          bson.ObjectId `bson:"_id" json:"id"`
 	Username    string        `bson:"username" json:"username"`
 	Email       string        `bson:"email" json:"email"`
+	Password	string		  `bson:"password"`
 	FirstName   string        `bson:"first_name" json:"first_name"`
 	LastName    string        `bson:"last_name" json:"last_name"`
 	Image       string        `bson:"image" json:"image"`
@@ -38,7 +40,15 @@ type SocialMedia struct {
 // AddUser function
 func AddUser(u User) string {
 	u.ID = bson.NewObjectId()
-	err := db.Insert(collection, u)
+	//invalid user
+	if u.Password == "" {
+		log.Printf("New User Error:: %v", "Invalid user")
+		return ""
+	}
+	//bcrypt hashed password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	u.Password = string(hashedPassword)
+	err = db.Insert(collection, u)
 	if err != nil {
 		log.Printf("New User Error:: %v", err)
 		return ""
@@ -55,6 +65,22 @@ func GetUser(uid string) (*User, error) {
 		return nil, errors.New("User not exists")
 	}
 	return u, nil
+}
+
+//GetUserByCredential for fetching with username and password
+func GetUserByCredentials(username, password string) (string, error) {
+	u := &User{Username:username}
+	err := db.Find(collection, u).One(&u)
+	if err != nil {
+		log.Printf("Get User error :: %v ", err)
+		return "", errors.New("User doesn't exist")
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	if err != nil {
+		log.Printf("Get User error :: %v ", err)
+		return "", errors.New("Bad Password")
+	}
+	return string(u.ID), nil
 }
 
 // GetAllUsers function
