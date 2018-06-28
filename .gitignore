@@ -16,3 +16,6 @@
 vendor/
 
 *.tmp
+
+./lastupdate.tmp
+./connect

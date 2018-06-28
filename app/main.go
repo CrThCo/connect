@@ -1,14 +1,14 @@
 package main
 
 import (
-	"strings"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	_ "github.com/MartinResearchSociety/connect/routers"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/dgrijalva/jwt-go"
 )
 
 func main() {
@@ -18,11 +18,11 @@ func main() {
 	}
 
 	var AuthFilter = func(ctx *context.Context) {
-	
+
 		ctx.Output.Header("Content-Type", "application/json")
-    	header := strings.Split(ctx.Input.Header("Authorization"), " ")
-    	if len(header) != 2 || header[0] != "Bearer" {
-        	ctx.Abort(401, "Not Authorized")
+		header := strings.Split(ctx.Input.Header("Authorization"), " ")
+		if len(header) != 2 || header[0] != "Bearer" {
+			ctx.Abort(401, "Not Authorized")
 		}
 
 		var tokenString string = ctx.Input.Header("Authorization")
@@ -32,34 +32,32 @@ func main() {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
-		// TODO: change for production
-		return []byte(beego.AppConfig.String("HMACKEY")), nil
+			// TODO: change for production
+			return []byte(beego.AppConfig.String("HMACKEY")), nil
 		})
 
 		if err != nil {
-		ctx.Output.SetStatus(403)
-		resBytes, err := json.Marshal(err.Error())
-		ctx.Output.Body(resBytes)
-		if err != nil {
-			panic(err)
+			ctx.Output.SetStatus(403)
+			resBytes, err := json.Marshal(err.Error())
+			ctx.Output.Body(resBytes)
+			if err != nil {
+				panic(err)
+			}
 		}
-	}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid && claims != nil {
 			return
-		} 	
+		}
 		ctx.Output.SetStatus(403)
 		ctx.Output.Body([]byte("Invalid token!"))
 		if err != nil {
 			panic(err)
 		}
-	
-	
-    }
+
+	}
 
 	//TODO: everything is filtered?!
-    beego.InsertFilter("/*", beego.BeforeRouter, AuthFilter)
-
+	beego.InsertFilter("/asdasd*", beego.BeforeRouter, AuthFilter)
 
 	beego.Run()
 }

@@ -7,6 +7,14 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:LoginController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:LoginController"],
+		beego.ControllerComments{
+			Method: "Auth",
+			Router: `/auth`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
 		beego.ControllerComments{
 			Method: "Post",

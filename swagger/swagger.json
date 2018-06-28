@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "beego Test API",
+        "title": "Connect API Console",
         "description": "beego has a very cool tools to autogenerate documents for your API",
         "version": "1.0.0",
         "termsOfService": "http://beego.me/",
@@ -51,6 +51,34 @@
                 "responses": {
                     "200": {
                         "description": "{int} models.User.Id"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/user/auth": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "create tokens",
+                "operationId": "LoginController.Auth",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for user content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Auth"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} models.JWT"
                     },
                     "403": {
                         "description": "body is empty"
@@ -128,6 +156,18 @@
         "bson.ObjectId": {
             "type": "object"
         },
+        "models.Auth": {
+            "title": "Auth",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SocialMedia": {
             "title": "SocialMedia",
             "type": "object",
@@ -162,6 +202,9 @@
                 "last_name": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "social_media": {
                     "type": "array",
                     "items": {
@@ -173,11 +216,5 @@
                 }
             }
         }
-    },
-    "tags": [
-        {
-            "name": "user",
-            "description": "Operations about Users\n"
-        }
-    ]
+    }
 }

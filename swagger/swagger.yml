@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  title: beego Test API
+  title: Connect API Console
   description: beego has a very cool tools to autogenerate documents for your API
   version: 1.0.0
   termsOfService: http://beego.me/
@@ -82,9 +82,35 @@ paths:
             $ref: '#/definitions/models.User'
         "403":
           description: :uid is not int
+  /user/auth:
+    post:
+      tags:
+      - user
+      description: create tokens
+      operationId: LoginController.Auth
+      parameters:
+      - in: body
+        name: body
+        description: body for user content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Auth'
+      responses:
+        "200":
+          description: '{int} models.JWT'
+        "403":
+          description: body is empty
 definitions:
   bson.ObjectId:
     type: object
+  models.Auth:
+    title: Auth
+    type: object
+    properties:
+      password:
+        type: string
+      username:
+        type: string
   models.SocialMedia:
     title: SocialMedia
     type: object
@@ -109,13 +135,11 @@ definitions:
         type: string
       last_name:
         type: string
+      password:
+        type: string
       social_media:
         type: array
         items:
           $ref: '#/definitions/models.SocialMedia'
       username:
         type: string
-tags:
-- name: user
-  description: |
-    Operations about Users

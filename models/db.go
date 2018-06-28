@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/astaxie/beego"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -25,7 +26,7 @@ var (
 func GetMongo() *MongoConnection {
 	once.Do(func() {
 		instance = &MongoConnection{
-			ConnectionString: "mongodb://ds261660.mlab.com:61660",
+			ConnectionString: beego.AppConfig.String("DBServer"),
 			DatabaseName:     "connect-test",
 		}
 		instance.Connect()
@@ -59,7 +60,7 @@ func (db *MongoConnection) Connect() {
 				continue
 			}
 		}
-
+		log.Println("Connection established with mongodb!")
 		db.Instance = session.DB(db.DatabaseName)
 		break
 	}

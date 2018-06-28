@@ -18,12 +18,18 @@ func init() {
 	collection = "user"
 }
 
+// Auth struct
+type Auth struct {
+	Username string `bson:"username" json:"username"`
+	Password string `bson:"password" json:"password"`
+}
+
 // User struct
 type User struct {
 	ID          bson.ObjectId `bson:"_id" json:"id"`
 	Username    string        `bson:"username" json:"username"`
 	Email       string        `bson:"email" json:"email"`
-	Password	string		  `bson:"password"`
+	Password    string        `bson:"password" json:"password"`
 	FirstName   string        `bson:"first_name" json:"first_name"`
 	LastName    string        `bson:"last_name" json:"last_name"`
 	Image       string        `bson:"image" json:"image"`
@@ -67,9 +73,9 @@ func GetUser(uid string) (*User, error) {
 	return u, nil
 }
 
-//GetUserByCredential for fetching with username and password
+// GetUserByCredentials for fetching with username and password
 func GetUserByCredentials(username, password string) (string, error) {
-	u := &User{Username:username}
+	u := &User{Username: username}
 	err := db.Find(collection, u).One(&u)
 	if err != nil {
 		log.Printf("Get User error :: %v ", err)
