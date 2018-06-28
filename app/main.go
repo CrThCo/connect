@@ -57,7 +57,7 @@ func main() {
 	}
 
 	//TODO: everything is filtered?!
-	beego.InsertFilter("/asdasd*", beego.BeforeRouter, AuthFilter)
+	beego.InsertFilter("/*", beego.BeforeRouter, AuthFilter)
 
 	beego.Run()
 }
