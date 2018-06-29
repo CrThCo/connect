@@ -8,6 +8,7 @@ import (
 	_ "github.com/MartinResearchSociety/connect/routers"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/plugins/cors"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -20,6 +21,7 @@ func main() {
 	var AuthFilter = func(ctx *context.Context) {
 
 		ctx.Output.Header("Content-Type", "application/json")
+		ctx.Output.Header("Access-Control-Allow-Origin", "*")
 		header := strings.Split(ctx.Input.Header("Authorization"), " ")
 		if len(header) != 2 || header[0] != "Bearer" {
 			ctx.Abort(401, "Not Authorized")
@@ -58,6 +60,13 @@ func main() {
 
 	//TODO: everything is filtered?!
 	beego.InsertFilter("/*", beego.BeforeRouter, AuthFilter)
+	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowAllOrigins:  true,
+		AllowHeaders:     []string{"content-type", "Origin"},
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "OPTIONS"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	beego.Run()
 }
