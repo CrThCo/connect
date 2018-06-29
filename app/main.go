@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	sessionName    = "connect-app"
-	sessionSecret  = "some-secret"
+	sessionName    = "example-twtter-app"
+	sessionSecret  = "example cookie signing secret"
 	sessionUserKey = "twitterID"
 )
 
@@ -32,11 +32,9 @@ func main() {
 
 	// 1. Register Twitter login and callback handlers
 	oauth1Config := &oauth1.Config{
-//		ConsumerKey:    beego.AppConfig.String("consumerKey"),
-//		ConsumerSecret: beego.AppConfig.String("consumerSecret"),
-		ConsumerKey:    "hHxC762CQVxTd3MuIMI6ijT1P",
-		ConsumerSecret: "MqkQ7abNQlmwMAS3IZXXcyrkWw51KEAZ3yV06iUR4nDvaqO8le",
-		CallbackURL:    "http://localhost:8050/v1/twitter/callback",
+		ConsumerKey:    "9b6zZShiwX6VKKHOTZqNq5Phz",
+		ConsumerSecret: "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD",
+		CallbackURL:    "http://myserver.local:8050/v1/twitter/callback",
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
 
