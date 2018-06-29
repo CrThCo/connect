@@ -14,13 +14,27 @@ import (
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
 	"github.com/dghubble/sessions"
+	. "github.com/kkdai/twitter"
 )
+
+var ConsumerKey string
+var ConsumerSecret string
+var twitterClient *ServerClient
+
+func init() {
+	ConsumerKey=    "9b6zZShiwX6VKKHOTZqNq5Phz"
+	ConsumerSecret= "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD"
+}
 
 const (
 	sessionName    = "example-twtter-app"
 	sessionSecret  = "example cookie signing secret"
 	sessionUserKey = "twitterID"
-)
+		//This URL need note as follow:
+		// 1. Could not be localhost, change your hosts to a specific domain name
+		// 2. This setting must be identical with your app setting on twitter Dev
+		CallbackURL string = "http://myserver.local:8030/maketoken"
+	)
 
 var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
 
@@ -28,13 +42,16 @@ func main() {
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-	}
+	}	
+	
+	twitterClient = NewServerClient(ConsumerKey, ConsumerSecret)
+
 
 	// 1. Register Twitter login and callback handlers
 	oauth1Config := &oauth1.Config{
 		ConsumerKey:    "9b6zZShiwX6VKKHOTZqNq5Phz",
 		ConsumerSecret: "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD",
-		CallbackURL:    "http://myserver.local:8050/v1/twitter/callback",
+		CallbackURL:    "http://myserver.local:8050/twitter/callback",
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
 
@@ -79,8 +96,9 @@ func main() {
 	//TODO: make it so that all filtered routes lie under this
 	beego.InsertFilter("/v1/user/*", beego.BeforeRouter, AuthFilter)
 
-	beego.Handler("/v1/twitter/login", twitter.LoginHandler(oauth1Config, nil))
-	beego.Handler("/v1/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
+	beego.Handler("/profile", profileHandler())
+	beego.Handler("/twitter/login", blah())
+	beego.Handler("/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
 
 	beego.Run()
 }
@@ -102,4 +120,19 @@ func issueSession() http.Handler {
 		http.Redirect(w, req, "/profile", http.StatusFound)
 	}
 	return http.HandlerFunc(fn)
+}
+
+func blah() http.Handler {
+	return  http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println("Enter redirect to twitter")
+			fmt.Println("Token URL=", CallbackURL)
+			requestUrl := twitterClient.GetAuthURL(CallbackURL)
+			http.Redirect(w, r, requestUrl, http.StatusTemporaryRedirect)
+			fmt.Println("Leave redirect") })
+}
+func profileHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprint(w, `<p>You are logged in!</p><form action="/logout" method="post"><input type="submit" value="Logout"></form>`)
+})
 }
