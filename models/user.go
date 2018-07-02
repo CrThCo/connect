@@ -54,6 +54,15 @@ func AddUser(u User) string {
 	//bcrypt hashed password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	u.Password = string(hashedPassword)
+	// make sure there is no duplication when adding users
+	i, err := db.Find(collection, bson.M{"$or": []bson.M{
+		{"username": u.Username},
+		{"email": u.Email},
+	}}).Count()
+	if i > 0 {
+		log.Printf("New User Error:: %v", "username or email is already in use")
+		return ""
+	}
 	err = db.Insert(collection, u)
 	if err != nil {
 		log.Printf("New User Error:: %v", err)
