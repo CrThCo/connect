@@ -32,9 +32,9 @@ func main() {
 
 	// 1. Register Twitter login and callback handlers
 	oauth1Config := &oauth1.Config{
-		ConsumerKey:    "9b6zZShiwX6VKKHOTZqNq5Phz",
-		ConsumerSecret: "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD",
-		CallbackURL:    "http://myserver.local:8050/v1/twitter/callback",
+		ConsumerKey:    beego.AppConfig.String("TwitterKey"),
+		ConsumerSecret: beego.AppConfig.String("TwitterSecret"),
+		CallbackURL:    beego.AppConfig.String("TwitterCallback"),
 		Endpoint:       twitterOAuth1.AuthorizeEndpoint,
 	}
 
@@ -79,8 +79,8 @@ func main() {
 	//TODO: make it so that all filtered routes lie under this
 	beego.InsertFilter("/v1/user/*", beego.BeforeRouter, AuthFilter)
 
-	beego.Handler("/v1/twitter/login", twitter.LoginHandler(oauth1Config, nil))
-	beego.Handler("/v1/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
+	beego.Handler("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
+	beego.Handler("/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
 
 	beego.Run()
 }
