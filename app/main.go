@@ -22,8 +22,8 @@ var ConsumerSecret string
 var twitterClient *ServerClient
 
 func init() {
-	ConsumerKey=    "9b6zZShiwX6VKKHOTZqNq5Phz"
-	ConsumerSecret= "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD"
+	ConsumerKey    = "9b6zZShiwX6VKKHOTZqNq5Phz"
+	ConsumerSecret = "5PJUoBMA1D3AhIXQW1KF8VRMH2EDaD2iS2TAaPLpkOC6bmFWHD"
 }
 
 const (
@@ -33,7 +33,7 @@ const (
 		//This URL need note as follow:
 		// 1. Could not be localhost, change your hosts to a specific domain name
 		// 2. This setting must be identical with your app setting on twitter Dev
-		CallbackURL string = "http://myserver.local:8030/maketoken"
+		CallbackURL string = "http://myserver.local:8030/twitter/callback"
 	)
 
 var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
