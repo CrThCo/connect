@@ -91,7 +91,6 @@ func main() {
 	beego.Handler("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
 	beego.Handler("/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
 	//TODO: everything is filtered?!
-	beego.InsertFilter("/*", beego.BeforeRouter, AuthFilter)
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
 		AllowHeaders:     []string{"content-type", "Origin"},
