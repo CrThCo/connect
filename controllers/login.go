@@ -24,34 +24,30 @@ type LoginController struct {
 // @router /login [post]
 func (l *LoginController) Auth() {
 	var u models.Auth
-	var err error
 	json.Unmarshal(l.Ctx.Input.RequestBody, &u)
-	uid, err := models.GetUserByCredentials(u.Email, u.Password)
+	uid, err := models.GetUserByCredentials(u.Username, u.Password)
+	if uid != "" && err == nil {
+		h := md5.New()
+		currentTimestamp := time.Now().UTC().Unix()
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+			Subject:   uid,
+			IssuedAt:  currentTimestamp,
+			NotBefore: currentTimestamp,
+			// TODO: make it configurable for production
+			ExpiresAt: currentTimestamp + 3600,
+			//TODO: change in production - should be configurable
+			Issuer: l.Ctx.Input.Domain(),
+			Id:     string(h.Sum(nil)),
+		})
+		tokenString, err := token.SignedString([]byte(beego.AppConfig.String("HMACKEY")))
 
-	if err != nil {
-		l.Abort("401")
-		return
+		if err != nil {
+			l.Data["json"] = err.Error()
+		}
+
+		l.Data["json"] = map[string]string{"token": tokenString}
+	} else {
+		l.Data["json"] = ""
 	}
-
-	currentTimestamp := time.Now().UTC().Unix()
-	// md5 of sub & iat
-	h := md5.New()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"UserID":    string(uid),
-		"IssuedAt":  currentTimestamp,
-		"NotBefore": currentTimestamp,
-		// TODO: make it configurable for production
-		"ExpiresAt": currentTimestamp + 13600,
-		//TODO: change in production - should be configurable
-		"Issuer": l.Ctx.Input.Domain(),
-		"Id":     hex.EncodeToString(h.Sum(nil)),
-	})
-	tokenString, err := token.SignedString([]byte(beego.AppConfig.String("HMACKEY")))
-
-	if err != nil {
-		l.Data["json"] = err.Error()
-	}
-
-	l.Data["json"] = map[string]string{"token": tokenString}
 	l.ServeJSON()
 }
