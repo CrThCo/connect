@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"net/http"
+	"strings"
+
 	_ "github.com/MartinResearchSociety/connect/routers"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
@@ -40,6 +41,12 @@ func main() {
 	}
 
 	var AuthFilter = func(ctx *context.Context) {
+
+		// Excluding Loging and Register route
+		switch ctx.Request.RequestURI {
+		case "/v1/user/signup", "/v1/user/auth":
+			return
+		}
 
 		ctx.Output.Header("Content-Type", "application/json")
 		ctx.Output.Header("Access-Control-Allow-Origin", "*")
@@ -79,7 +86,7 @@ func main() {
 	}
 
 	//TODO: make it so that all filtered routes lie under this
-	beego.InsertFilter("/v1/user/*", beego.BeforeRouter, AuthFilter)
+	beego.InsertFilter("/v1/*", beego.BeforeRouter, AuthFilter)
 
 	beego.Handler("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
 	beego.Handler("/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
