@@ -44,7 +44,7 @@ func main() {
 
 		// Excluding Loging and Register route
 		switch ctx.Request.RequestURI {
-		case "/v1/user/signup", "/v1/user/auth":
+		case "/v1/user/signup", "/v1/user/login":
 			return
 		}
 

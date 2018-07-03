@@ -32,7 +32,7 @@
                 }
             }
         },
-        "/user/auth": {
+        "/user/login": {
             "post": {
                 "tags": [
                     "user"

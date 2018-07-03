@@ -65,7 +65,7 @@ paths:
             $ref: '#/definitions/models.User'
         "403":
           description: :uid is not int
-  /user/auth:
+  /user/login:
     post:
       tags:
       - user

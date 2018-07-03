@@ -20,7 +20,7 @@ type LoginController struct {
 // @Param	body		body 	models.Auth	true "body for user content"
 // @Success 200 {int} models.JWT
 // @Failure 403 body is empty
-// @router /auth [post]
+// @router /login [post]
 func (l *LoginController) Auth() {
 	var u models.Auth
 	var err error
