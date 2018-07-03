@@ -14,6 +14,8 @@ import (
 type MongoConnection struct {
 	ConnectionString string
 	DatabaseName     string
+	MgoUser string
+	MgoPassword string
 	Instance         *mgo.Database
 }
 
@@ -27,7 +29,9 @@ func GetMongo() *MongoConnection {
 	once.Do(func() {
 		instance = &MongoConnection{
 			ConnectionString: beego.AppConfig.String("DBServer"),
-			DatabaseName:     "connect-test",
+			DatabaseName:     beego.AppConfig.String("DBName"),
+			MgoUser: beego.AppConfig.String("MgoUser"),
+			MgoPassword: beego.AppConfig.String("MgoPassword"),
 		}
 		instance.Connect()
 	})
@@ -49,7 +53,6 @@ func (db *MongoConnection) Connect() {
 	// 	db.Instance = client.Database(db.DatabaseName)
 	// 	break
 	// }
-
 	for {
 		session, err := mgo.Dial(db.ConnectionString)
 
@@ -61,7 +64,13 @@ func (db *MongoConnection) Connect() {
 			}
 		}
 		log.Println("Connection established with mongodb!")
+
 		db.Instance = session.DB(db.DatabaseName)
+		//TODO: should be an env variable
+		err = db.Instance.Login(db.MgoUser, db.MgoPassword)
+		if err != nil {
+			log.Printf("Mongo login failed:: %v", err)
+		}
 		break
 	}
 
