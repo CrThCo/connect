@@ -10,6 +10,7 @@
     "context/param",
     "grace",
     "logs",
+    "plugins/cors",
     "session",
     "toolbox",
     "utils"
@@ -27,7 +28,7 @@
   branch = "master"
   name = "github.com/gopherjs/gopherjs"
   packages = ["js"]
-  revision = "8dffc02ea1cb8398bb73f30424697c60fcf8d4c5"
+  revision = "0892b62f0d9fb5857760c3cfca837207185117ee"
 
 [[projects]]
   name = "github.com/jtolds/gls"
@@ -79,6 +80,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bffc8c6c47643b0aa136149db70f88080807e5e1791d44ca6439e188a1c12343"
+  inputs-digest = "e067b4e67b2200b608e6ba95fabaa0251d833dc56f6a32f8c5eaa8930dc2698b"
   solver-name = "gps-cdcl"
   solver-version = 1

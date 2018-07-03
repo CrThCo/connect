@@ -23,31 +23,3 @@
 #   non-go = false
 #   go-tests = true
 #   unused-packages = true
-
-
-[[constraint]]
-  name = "github.com/astaxie/beego"
-  version = "1.9.2"
-
-[[constraint]]
-  name = "github.com/smartystreets/goconvey"
-  version = "1.6.3"
-
-[prune]
-  go-tests = true
-  unused-packages = true
-
-[[constraint]]
-  name = "github.com/leesper/couchdb-golang"
-  version = "1.2.1"
-
-[[constraint]]
-  name = "github.com/mongodb/mongo-go-driver"
-  version = "0.0.4"
-
-[[constraint]]
-  branch = "v2"
-  name = "gopkg.in/mgo.v2"
-
-[[constraint]]
-  name = "github.com/dgrijalva/jwt-go"
