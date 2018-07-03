@@ -106,7 +106,6 @@ func GetUserByCredentials(email, password string) (string, error) {
 		return "", errors.New("User doesn't exist")
 	}
 
-	log.Println(u.Password)
 	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	if err != nil {
 		log.Printf("Get User error 2 :: %v ", err)
