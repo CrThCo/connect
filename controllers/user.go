@@ -21,11 +21,20 @@ type UserController struct {
 // @router /signup [post]
 func (u *UserController) Post() {
 	var user models.User
-	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &user); err != nil {
+		u.Ctx.Output.SetStatus(400)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
+	}
 	err := user.Insert()
 	if err != nil {
-		u.Abort("400")
+		u.Ctx.Output.SetStatus(500)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
 	}
+	u.Ctx.Output.SetStatus(200)
 	u.Data["json"] = user
 	u.ServeJSON()
 }
@@ -48,14 +57,19 @@ func (u *UserController) GetAll() {
 // @router /:uid [get]
 func (u *UserController) Get() {
 	uid := u.GetString(":uid")
-	if uid != "" {
-		user, err := models.GetUser(uid)
-		if err != nil {
-			u.Data["json"] = err.Error()
-		} else {
-			u.Data["json"] = user
-		}
+	if uid == "" {
+		u.Ctx.Output.SetStatus(400)
+		u.Data["json"] = "Bad Request"
+		u.ServeJSON()
 	}
+	user, err := models.GetUser(uid)
+	if err != nil {
+		u.Ctx.Output.SetStatus(500)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
+	}
+	u.Data["json"] = user
 	u.ServeJSON()
 }
 
