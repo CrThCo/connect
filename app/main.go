@@ -55,7 +55,7 @@ func main() {
 			ctx.Abort(401, "Not Authorized")
 		}
 
-		var tokenString string = ctx.Input.Header("Authorization")
+		var tokenString string = header[1]
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -85,19 +85,19 @@ func main() {
 		}
 	}
 
-	//TODO: make it so that all filtered routes lie under this
-	beego.InsertFilter("/v1/*", beego.BeforeRouter, AuthFilter)
-
 	beego.Handler("/twitter/login", twitter.LoginHandler(oauth1Config, nil))
 	beego.Handler("/twitter/callback", twitter.CallbackHandler(oauth1Config, issueSession(), nil))
 	//TODO: everything is filtered?!
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
-		AllowHeaders:     []string{"content-type", "Origin"},
+		AllowHeaders:     []string{"content-type", "authorization"},
 		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "OPTIONS"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+
+	//TODO: make it so that all filtered routes lie under this
+	beego.InsertFilter("/v1/*", beego.BeforeRouter, AuthFilter)
 
 	beego.Run()
 }

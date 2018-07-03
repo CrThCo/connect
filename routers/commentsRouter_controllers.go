@@ -15,6 +15,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"],
+		beego.ControllerComments{
+			Method: "NewPost",
+			Router: `/save`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
 		beego.ControllerComments{
 			Method: "GetAll",
