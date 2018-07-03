@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -20,7 +21,7 @@ func init() {
 
 // Auth struct
 type Auth struct {
-	Username string `bson:"username" json:"username"`
+	Email    string `bson:"email" json:"email"`
 	Password string `bson:"password" json:"password"`
 }
 
@@ -43,32 +44,45 @@ type SocialMedia struct {
 	URL  string `bson:"url" json:"url"`
 }
 
-// AddUser function
-func AddUser(u User) string {
+// Insert method
+func (u *User) Insert() error {
 	u.ID = bson.NewObjectId()
-	//invalid user
+	// Password should not be empty.
+	// TODO :: Add email, usename validation rules
 	if u.Password == "" {
-		log.Printf("New User Error:: %v", "Invalid user")
-		return ""
+		return errors.New("user password should not be empty")
+	}
+
+	where := bson.M{
+		"$or": []bson.M{
+			{"username": u.Username},
+			{"email": u.Email},
+		},
+	}
+	// make sure there is no duplication when adding users
+	count, err := db.Find(collection, where).Count()
+	if err != nil {
+		log.Printf("Error! duplication user %v", err)
+		return errors.New("internal server error, please try again")
+	}
+
+	if count > 0 {
+		return fmt.Errorf("username %s or email %s already in use", u.Username, u.Email)
 	}
 	//bcrypt hashed password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	u.Password = string(hashedPassword)
-	// make sure there is no duplication when adding users
-	i, err := db.Find(collection, bson.M{"$or": []bson.M{
-		{"username": u.Username},
-		{"email": u.Email},
-	}}).Count()
-	if i > 0 {
-		log.Printf("New User Error:: %v", "username or email is already in use")
-		return ""
-	}
-	err = db.Insert(collection, u)
 	if err != nil {
-		log.Printf("New User Error:: %v", err)
-		return ""
+		log.Printf("Error! generating password hash %v", err)
+		return errors.New("internal server error, please try again")
 	}
-	return u.ID.Hex()
+	u.Password = string(hashedPassword)
+	if err = db.Insert(collection, u); err != nil {
+		log.Printf("New User Error:: %v", err)
+		return errors.New("something went wrong while creating your account")
+	}
+
+	u.Password = ""
+	return nil
 }
 
 // GetUser function
@@ -83,16 +97,19 @@ func GetUser(uid string) (*User, error) {
 }
 
 // GetUserByCredentials for fetching with username and password
-func GetUserByCredentials(username, password string) (string, error) {
-	u := &User{Username: username}
-	err := db.Find(collection, u).One(&u)
+func GetUserByCredentials(email, password string) (string, error) {
+	u := &User{Email: email}
+	log.Println(email)
+	err := db.Find(collection, bson.M{"email": email}).One(&u)
 	if err != nil {
-		log.Printf("Get User error :: %v ", err)
+		log.Printf("Get User error 1 :: %v ", err)
 		return "", errors.New("User doesn't exist")
 	}
+
+	log.Println(u.Password)
 	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	if err != nil {
-		log.Printf("Get User error :: %v ", err)
+		log.Printf("Get User error 2 :: %v ", err)
 		return "", errors.New("Bad Password")
 	}
 	return string(u.ID), nil

@@ -18,12 +18,15 @@ type UserController struct {
 // @Param	body		body 	models.User	true		"body for user content"
 // @Success 200 {int} models.User.Id
 // @Failure 403 body is empty
-// @router / [post]
+// @router /signup [post]
 func (u *UserController) Post() {
 	var user models.User
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
-	uid := models.AddUser(user)
-	u.Data["json"] = map[string]string{"uid": uid}
+	err := user.Insert()
+	if err != nil {
+		u.Abort("400")
+	}
+	u.Data["json"] = user
 	u.ServeJSON()
 }
 

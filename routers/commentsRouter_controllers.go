@@ -10,15 +10,15 @@ func init() {
 	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:LoginController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:LoginController"],
 		beego.ControllerComments{
 			Method: "Auth",
-			Router: `/auth`,
+			Router: `/login`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"],
 		beego.ControllerComments{
-			Method: "Post",
-			Router: `/`,
+			Method: "NewPost",
+			Router: `/save`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -44,6 +44,14 @@ func init() {
 			Method: "Put",
 			Router: `/:uid`,
 			AllowHTTPMethods: []string{"put"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "Post",
+			Router: `/signup`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 

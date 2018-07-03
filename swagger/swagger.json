@@ -30,35 +30,9 @@
                         }
                     }
                 }
-            },
-            "post": {
-                "tags": [
-                    "user"
-                ],
-                "description": "create users",
-                "operationId": "UserController.CreateUser",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for user content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{int} models.User.Id"
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
             }
         },
-        "/user/auth": {
+        "/user/login": {
             "post": {
                 "tags": [
                     "user"
@@ -79,6 +53,34 @@
                 "responses": {
                     "200": {
                         "description": "{int} models.JWT"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/user/signup": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "create users",
+                "operationId": "UserController.CreateUser",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for user content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} models.User.Id"
                     },
                     "403": {
                         "description": "body is empty"

@@ -19,6 +19,50 @@
   version = "v1.9.2"
 
 [[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dghubble/go-twitter"
+  packages = ["twitter"]
+  revision = "093ee2cf4e32ef608cded0ace84d5d82a52da4fa"
+
+[[projects]]
+  name = "github.com/dghubble/gologin"
+  packages = [
+    ".",
+    "internal",
+    "oauth1",
+    "twitter"
+  ]
+  revision = "ea49f1659cedb2bbef34a869e014700fec178ae5"
+  version = "v2.0.0"
+
+[[projects]]
+  name = "github.com/dghubble/oauth1"
+  packages = [
+    ".",
+    "twitter"
+  ]
+  revision = "70562a5920ad9b6ff03ef697c0f90ae569abbd2b"
+  version = "v0.4.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dghubble/sessions"
+  packages = ["."]
+  revision = "26dc61fdb7361714ff41a80a2ad18cbdf8ba1956"
+
+[[projects]]
+  name = "github.com/dghubble/sling"
+  packages = ["."]
+  revision = "eb56e89ac5088bebb12eef3cb4b293300f43608b"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
@@ -26,9 +70,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/gopherjs/gopherjs"
   packages = ["js"]
   revision = "0892b62f0d9fb5857760c3cfca837207185117ee"
+
+[[projects]]
+  name = "github.com/gorilla/securecookie"
+  packages = ["."]
+  revision = "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/jtolds/gls"
@@ -66,6 +122,12 @@
   revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "ed29d75add3d7c4bf7ca65aac0c6df3d1420216f"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/mgo.v2"
   packages = [
@@ -80,6 +142,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e067b4e67b2200b608e6ba95fabaa0251d833dc56f6a32f8c5eaa8930dc2698b"
+  inputs-digest = "de86b12e627c16cdf49a782fb69050fbe47c89dc81f1cd5d48ef342e1f463772"
   solver-name = "gps-cdcl"
   solver-version = 1
