@@ -8,11 +8,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// Operations about Users
+// UserController Operations about Users
 type UserController struct {
 	beego.Controller
 }
 
+// Post method for endpoing signup
 // @Title CreateUser
 // @Description create users
 // @Param	body		body 	models.User	true		"body for user content"
@@ -39,6 +40,7 @@ func (u *UserController) Post() {
 	u.ServeJSON()
 }
 
+// GetAll method for endpoint /
 // @Title GetAll
 // @Description get all Users
 // @Success 200 {object} models.User
@@ -61,6 +63,7 @@ func (u *UserController) Get() {
 		u.Ctx.Output.SetStatus(400)
 		u.Data["json"] = "Bad Request"
 		u.ServeJSON()
+		return
 	}
 	user, err := models.GetUser(uid)
 	if err != nil {
@@ -82,15 +85,28 @@ func (u *UserController) Get() {
 // @router /:uid [put]
 func (u *UserController) Put() {
 	uid := u.GetString(":uid")
-	if uid != "" {
-		var user models.User
-		json.Unmarshal(u.Ctx.Input.RequestBody, &user)
-		uu, err := models.UpdateUser(uid, &user)
-		if err != nil {
-			u.Data["json"] = err.Error()
-		} else {
-			u.Data["json"] = uu
-		}
+	if uid == "" {
+		u.Ctx.Output.SetStatus(400)
+		u.Data["json"] = "Bad Request"
+		u.ServeJSON()
+		return
 	}
+	var user models.User
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &user); err != nil {
+		u.Ctx.Output.SetStatus(500)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
+	}
+
+	uu, err := models.UpdateUser(uid, &user)
+	if err != nil {
+		u.Ctx.Output.SetStatus(500)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
+	}
+
+	u.Data["json"] = uu
 	u.ServeJSON()
 }
