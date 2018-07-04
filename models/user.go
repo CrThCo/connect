@@ -111,7 +111,7 @@ func GetUserByCredentials(email, password string) (string, error) {
 		log.Printf("Get User error 2 :: %v ", err)
 		return "", errors.New("Bad Password")
 	}
-	return string(u.ID), nil
+	return u.ID.Hex(), nil
 }
 
 // GetAllUsers function

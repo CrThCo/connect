@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -43,4 +44,15 @@ func (p *Post) Insert() error {
 		return err
 	}
 	return nil
+}
+
+// GetByUser method
+func (p *Post) GetByUser() ([]*Post, error) {
+	var posts []*Post
+	err := GetMongo().Find(postCollecton, nil).All(&posts)
+	if err != nil {
+		log.Printf("Post -> GetByUser %v", err)
+		return nil, errors.New("unable to reterive posts for user")
+	}
+	return posts, nil
 }

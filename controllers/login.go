@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/MartinResearchSociety/connect/models"
@@ -49,7 +49,7 @@ func (l *LoginController) Auth() {
 
 	h := md5.New()
 	currentTimestamp := time.Now().UTC().Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+	standardClaims := jwt.StandardClaims{
 		Subject:   uid,
 		IssuedAt:  currentTimestamp,
 		NotBefore: currentTimestamp,
@@ -57,8 +57,9 @@ func (l *LoginController) Auth() {
 		ExpiresAt: currentTimestamp + 13600,
 		//TODO: change in production - should be configurable
 		Issuer: l.Ctx.Input.Domain(),
-		Id:     hex.EncodeToString(h.Sum(nil)),
-	})
+		Id:     fmt.Sprintf("%x", h.Sum(nil)),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, standardClaims)
 	tokenString, err := token.SignedString([]byte(beego.AppConfig.String("HMACKEY")))
 	if err != nil {
 		l.Ctx.Output.SetStatus(401)

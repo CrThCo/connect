@@ -56,6 +56,7 @@ func main() {
 		}
 
 		var tokenString string = header[1]
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -75,9 +76,12 @@ func main() {
 			}
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid && claims != nil {
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			sub, _ := claims["sub"].(string)
+			ctx.Input.SetParam("userID", sub)
 			return
 		}
+
 		ctx.Output.SetStatus(401)
 		ctx.Output.Body([]byte("Invalid token!"))
 		if err != nil {
