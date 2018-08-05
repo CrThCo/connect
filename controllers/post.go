@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/MartinResearchSociety/connect/models"
 	"github.com/astaxie/beego"
@@ -23,6 +24,13 @@ func (p *PostController) NewPost() {
 
 	if err := json.Unmarshal(p.Ctx.Input.RequestBody, &post); err != nil {
 		p.Ctx.Output.SetStatus(400)
+		p.Data["json"] = err.Error()
+		p.ServeJSON()
+		return
+	}
+	if err := post.SaveImage(); err != nil {
+		log.Println(err.Error())
+		p.Ctx.Output.SetStatus(500)
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
 		return
