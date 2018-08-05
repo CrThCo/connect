@@ -9,7 +9,7 @@ brew install golang dep
 go get github.com/MartinResearchSociety/connect
 cd $GOPATH/src/github.com/MartinResearchSociety/connect
 dep ensure
-go run app/main.go
+bee run -main=app/main.go -gendoc=true
 ```
 
 Swagger UI available at `localhost:8030/swagger`
