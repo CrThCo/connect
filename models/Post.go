@@ -15,15 +15,28 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var postCollecton string
+const (
+	postCollection = "posts"
+	voteCollection = "votes"
+)
 
-func init() {
-	postCollecton = "posts"
+type VoteOptions struct {
+	Name string  `json:"name"`
+	Value string `json:"value"`
 }
 
+type VoteStruct struct {
+	Options []VoteOptions `json:"options"`
+	Image string `json:"image"`
+
+}
+
+// Vote struct to store vote per 
 type Vote struct {
-	Voter    string    `bson:"voter" json:"voter"`
-	Vote     string    `bson:"vote" json:"vote"`
+	ID       bson.ObjectId `bson:"_id" json:"id"`
+	PostID   bson.ObjectId `bson:"post_id" json:"vote_id"`
+	VoterID  bson.ObjectId `bson:"voter_id" json:"voter_id"`
+	Vote     []string    `bson:"votes" json:"votes"`
 	CastedAt time.Time `bson:"created_at" json:"created_at"`
 }
 
@@ -36,7 +49,6 @@ type Post struct {
 	Verified  bool          `bson:"verified" json:"verified"`
 	Poster    string        `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`
-	Votes     []Vote        `bson:"votes" json:"votes"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
@@ -100,7 +112,7 @@ func (p *Post) Insert() error {
 		return err
 	}
 	p.Hash = fmt.Sprintf("%x", h.Sum(nil))
-	if err := GetMongo().Insert(postCollecton, p); err != nil {
+	if err := GetMongo().Insert(postCollection, p); err != nil {
 		log.Println(err)
 		return err
 	}
@@ -110,10 +122,47 @@ func (p *Post) Insert() error {
 // GetByUser method
 func (p *Post) GetByUser() ([]*Post, error) {
 	var posts []*Post
-	err := GetMongo().Find(postCollecton, nil).Sort("-$natural").All(&posts)
+	err := GetMongo().Find(postCollection, nil).Sort("-$natural").All(&posts)
 	if err != nil {
 		log.Printf("Post -> GetByUser %v", err)
 		return nil, errors.New("unable to reterive posts for user")
 	}
 	return posts, nil
+}
+
+// GetByID function
+func GetByID(uid string) (*Post, error) {
+	var post *Post
+	err := GetMongo().FindByID(postCollection, uid).One(&post)
+	if err != nil {
+		log.Printf("Post -> GetByID %v", err)
+		return nil, errors.New("unable to retrieve posts for user")
+	}
+	return post, nil
+}
+
+// Insert post
+func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
+	if (!postid.Valid() || !voterid.Valid()) {
+		return errors.New("Post id or voter id not valid")
+	}
+	if len(v.Options) == 0 {
+		return errors.New("No vote options")
+	}
+	var vote *Vote
+	vote.Vote = make([]string, 0, len(v.Options))
+	vote.ID = bson.NewObjectId()
+	vote.CastedAt = time.Now().UTC()
+	vote.PostID = postid
+	vote.VoterID = voterid
+	for _, o := range v.Options {
+		log.Println(o)
+		vote.Vote = append(vote.Vote, o.Name)
+	}
+	
+	if err := GetMongo().Insert(voteCollection, v); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }

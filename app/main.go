@@ -19,9 +19,10 @@ import (
 )
 
 const (
-	sessionName    = "example-twtter-app"
-	sessionSecret  = "example cookie signing secret"
+	sessionName    = "connect-twitter-app"
+	sessionSecret  = "example cookie signing secret" // TODO: should be in env
 	sessionUserKey = "twitterID"
+	sessionUserName = "twitterName"
 )
 
 var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
@@ -116,9 +117,10 @@ func issueSession() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Print(twitterUser)
+		// fmt.Print(twitterUser)
 		session := sessionStore.New(sessionName)
 		session.Values[sessionUserKey] = twitterUser.ID
+		session.Values[sessionUserName] = twitterUser.ScreenName
 		session.Save(w)
 		//TODO: redirect when it works
 		http.Redirect(w, req, "/profile", http.StatusFound)

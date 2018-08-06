@@ -11,6 +11,54 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /post/all:
+    get:
+      tags:
+      - post
+      description: Retrieve user posts
+      operationId: PostController.GetByUser
+      responses:
+        "200":
+          description: '{int} []models.Post'
+        "403":
+          description: body is empty
+  /post/save:
+    post:
+      tags:
+      - post
+      description: create new post
+      operationId: PostController.CreatPost
+      parameters:
+      - in: body
+        name: body
+        description: body for post content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Post'
+      responses:
+        "200":
+          description: '{int} models.Post.Id'
+        "403":
+          description: body is empty
+  /post/vote:
+    get:
+      tags:
+      - post
+      description: Reterive user posts
+      operationId: PostController.Vote
+      parameters:
+      - in: query
+        name: voterId
+        type: string
+      - in: query
+        name: vote
+        schema:
+          $ref: '#/definitions/models.VoteStruct'
+      responses:
+        "200":
+          description: '{int} models.Vote.Id'
+        "403":
+          description: body is empty
   /user/:
     get:
       tags:
@@ -101,6 +149,17 @@ paths:
           description: '{int} models.User.Id'
         "403":
           description: body is empty
+  /user/token/refresh:
+    get:
+      tags:
+      - user
+      description: refresh authentication token
+      operationId: LoginController.Refresh
+      responses:
+        "200":
+          description: '{string} models.JWT'
+        "403":
+          description: body is empty
 definitions:
   bson.ObjectId:
     type: object
@@ -108,10 +167,35 @@ definitions:
     title: Auth
     type: object
     properties:
+      email:
+        type: string
       password:
         type: string
-      username:
+  models.Post:
+    title: Post
+    type: object
+    properties:
+      content:
         type: string
+      created_at:
+        type: string
+        format: string
+      hash:
+        type: string
+      id:
+        $ref: '#/definitions/bson.ObjectId'
+      image:
+        type: string
+      poster:
+        type: string
+      updated_at:
+        type: string
+        format: string
+      verified:
+        type: boolean
+      vote_count:
+        type: integer
+        format: int64
   models.SocialMedia:
     title: SocialMedia
     type: object
@@ -144,3 +228,21 @@ definitions:
           $ref: '#/definitions/models.SocialMedia'
       username:
         type: string
+  models.VoteOptions:
+    title: VoteOptions
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+  models.VoteStruct:
+    title: VoteStruct
+    type: object
+    properties:
+      image:
+        type: string
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/models.VoteOptions'

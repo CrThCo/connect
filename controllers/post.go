@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
 	"log"
 
@@ -8,9 +9,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
+var opts []string
+
 type PostController struct {
 	beego.Controller
 }
+
 
 // @Title CreatPost
 // @Description create new post
@@ -48,7 +52,7 @@ func (p *PostController) NewPost() {
 
 // GetByUser controller method
 // @Title GetByUser
-// @Description Reterive user posts
+// @Description Retrieve user posts
 // @Success 200 {int} []models.Post
 // @Failure 403 body is empty
 // @router /all [get]
@@ -62,5 +66,27 @@ func (p *PostController) GetByUser() {
 		return
 	}
 	p.Data["json"] = posts
+	p.ServeJSON()
+}
+
+
+// Vote controller method
+// @Title Vote
+// @Description Reterive user posts
+// @Success 200 {int} models.Vote.Id
+// @Failure 403 body is empty
+// @router /vote [get]
+func (p *PostController) Vote(voterId, postId string, vote *models.VoteStruct) {
+	if !bson.IsObjectIdHex(voterId) || !bson.IsObjectIdHex(postId) {
+		log.Println("Either post id or voter id not valid")
+	}
+
+	if err := vote.AddVote(bson.ObjectIdHex(postId), bson.ObjectIdHex(voterId)); err != nil {
+		p.Ctx.Output.SetStatus(500)
+		p.Data["json"] = err.Error()
+		p.ServeJSON()
+		return
+	}
+	p.Data["json"] = "success"
 	p.ServeJSON()
 }
