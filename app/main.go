@@ -1,12 +1,15 @@
 package main
 
 import (
+	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 
 	_ "github.com/MartinResearchSociety/connect/routers"
+	"github.com/MartinResearchSociety/connect/models"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/plugins/cors"
@@ -15,24 +18,25 @@ import (
 	"github.com/dghubble/gologin/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
-	"github.com/dghubble/sessions"
+
+	"github.com/astaxie/beego/session"
 )
 
-const (
-	sessionName    = "connect-twitter-app"
-	sessionSecret  = "example cookie signing secret" // TODO: should be in env
-	sessionUserKey = "twitterID"
-	sessionUserName = "twitterName"
-)
+// var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
 
-var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
+var globalSessions *session.Manager
+
+func init() {
+    globalSessions, _ = session.NewManager("memory", &session.ManagerConfig{CookieName: "userId", EnableSetCookie: true, Gclifetime:3600, Maxlifetime: 3600, Secure: false, CookieLifeTime: 3600})
+    go globalSessions.GC()
+}
 
 func main() {
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-
+	
 	// 1. Register Twitter login and callback handlers
 	oauth1Config := &oauth1.Config{
 		ConsumerKey:    beego.AppConfig.String("TwitterKey"),
@@ -117,11 +121,37 @@ func issueSession() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// fmt.Print(twitterUser)
-		session := sessionStore.New(sessionName)
-		session.Values[sessionUserKey] = twitterUser.ID
-		session.Values[sessionUserName] = twitterUser.ScreenName
-		session.Save(w)
+		
+		// session := sessionStore.New(sessionName)
+		// session.Values[sessionUserKey] = twitterUser.ID
+		// // session.Values[sessionUserName] = twitterUser.ScreenName
+		// session.Save(w)
+		sess, _ := globalSessions.SessionStart(w, req)
+		defer sess.SessionRelease(w)
+
+		if u, err := models.GetUserByEmail(twitterUser.Email); err != nil {
+			fmt.Printf("Error trying to get user by email: %v", err.Error())
+		} else if u == nil {
+			fmt.Printf("User not added yet: email=%v", twitterUser.Email)
+		} else if u != nil {
+			// session.Values[sessionUserID] = u.ID.String()
+			sess.Set("userId", u.ID.String())
+		} else {
+			// add user, if not already present
+		u := &models.User{
+			ID: bson.NewObjectId(), 
+			Username: twitterUser.Name, 
+			Email: twitterUser.Email,
+		}
+
+		if err := u.Insert(); err != nil {
+			fmt.Printf("Couldn't add user: email=%v, err=%v", twitterUser.Email, err)
+		}
+
+		// session.Values[sessionUserID] = u.ID.String()
+		sess.Set("userId", u.ID.String())
+		}
+
 		//TODO: redirect when it works
 		http.Redirect(w, req, "/profile", http.StatusFound)
 	}

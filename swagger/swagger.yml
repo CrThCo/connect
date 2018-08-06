@@ -11,6 +11,31 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /post/{id}/vote:
+    post:
+      tags:
+      - post
+      description: Reterive user posts
+      operationId: PostController.Vote
+      parameters:
+      - in: body
+        name: body
+        description: body for post content
+        required: true
+        schema:
+          $ref: '#/definitions/models.VoteStruct'
+      - in: query
+        name: postId
+        type: string
+      - in: query
+        name: vote
+        schema:
+          $ref: '#/definitions/models.VoteStruct'
+      responses:
+        "200":
+          description: '{int} models.Vote.Id'
+        "403":
+          description: body is empty
   /post/all:
     get:
       tags:
@@ -38,25 +63,6 @@ paths:
       responses:
         "200":
           description: '{int} models.Post.Id'
-        "403":
-          description: body is empty
-  /post/vote:
-    get:
-      tags:
-      - post
-      description: Reterive user posts
-      operationId: PostController.Vote
-      parameters:
-      - in: query
-        name: voterId
-        type: string
-      - in: query
-        name: vote
-        schema:
-          $ref: '#/definitions/models.VoteStruct'
-      responses:
-        "200":
-          description: '{int} models.Vote.Id'
         "403":
           description: body is empty
   /user/:

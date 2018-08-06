@@ -97,9 +97,19 @@ func GetUser(uid string) (*User, error) {
 }
 
 // GetUserByCredentials for fetching with username and password
+func GetUserByEmail(email string) (*User, error) {
+	u := &User{Email: email}
+	err := db.Find(collection, bson.M{"email": email}).One(&u)
+	if err != nil {
+		log.Printf("Get User error 1 :: %v ", err)
+		return nil, errors.New("User doesn't exist")
+	}
+	return u, nil
+}
+
+// GetUserByCredentials for fetching with username and password
 func GetUserByCredentials(email, password string) (string, error) {
 	u := &User{Email: email}
-	log.Println(email)
 	err := db.Find(collection, bson.M{"email": email}).One(&u)
 	if err != nil {
 		log.Printf("Get User error 1 :: %v ", err)

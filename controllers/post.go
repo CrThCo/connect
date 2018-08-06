@@ -7,9 +7,8 @@ import (
 
 	"github.com/MartinResearchSociety/connect/models"
 	"github.com/astaxie/beego"
+	
 )
-
-var opts []string
 
 type PostController struct {
 	beego.Controller
@@ -73,14 +72,15 @@ func (p *PostController) GetByUser() {
 // Vote controller method
 // @Title Vote
 // @Description Reterive user posts
+// @Param body body models.VoteStruct true "body for post content"
 // @Success 200 {int} models.Vote.Id
 // @Failure 403 body is empty
-// @router /vote [get]
-func (p *PostController) Vote(voterId, postId string, vote *models.VoteStruct) {
-	if !bson.IsObjectIdHex(voterId) || !bson.IsObjectIdHex(postId) {
-		log.Println("Either post id or voter id not valid")
+// @router /:id/vote [post]
+func (p *PostController) Vote(postId string, vote *models.VoteStruct) {
+	if !bson.IsObjectIdHex(postId) {
+		log.Printf("Post id is invalid: id=%v\n", postId)
 	}
-
+	voterId := p.GetSession("userId").(string)
 	if err := vote.AddVote(bson.ObjectIdHex(postId), bson.ObjectIdHex(voterId)); err != nil {
 		p.Ctx.Output.SetStatus(500)
 		p.Data["json"] = err.Error()
