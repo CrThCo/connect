@@ -29,7 +29,7 @@ func init() {
 			Router: `/:id/vote`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(
-				param.New("postId"),
+				param.New("postID"),
 				param.New("vote"),
 			),
 			Params: nil})
@@ -48,6 +48,28 @@ func init() {
 			Router: `/save`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"],
+		beego.ControllerComments{
+			Method: "VoteCount",
+			Router: `/vote/count`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(
+				param.New("postID"),
+				param.New("userID"),
+			),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:PostController"],
+		beego.ControllerComments{
+			Method: "GetVotesBy",
+			Router: `/vote/get`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(
+				param.New("postID"),
+				param.New("userID"),
+			),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],

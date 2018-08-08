@@ -86,12 +86,12 @@ func (p *PostController) GetByUser() {
 // @Success 200 {int} models.Vote.Id
 // @Failure 403 body is empty
 // @router /:id/vote [post]
-func (p *PostController) Vote(postId string, vote *models.VoteStruct) {
-	if !bson.IsObjectIdHex(postId) {
-		log.Printf("Post id is invalid: id=%v\n", postId)
+func (p *PostController) Vote(postID string, vote *models.VoteStruct) {
+	if !bson.IsObjectIdHex(postID) {
+		log.Printf("Post id is invalid: id=%v\n", postID)
 	}
-	voterId := p.Ctx.Input.Param("userID")
-	if err := vote.AddVote(bson.ObjectIdHex(postId), bson.ObjectIdHex(voterId)); err != nil {
+	voterID := p.Ctx.Input.Param("userID")
+	if err := vote.AddVote(bson.ObjectIdHex(postID), bson.ObjectIdHex(voterID)); err != nil {
 		p.Ctx.Output.SetStatus(500)
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
@@ -100,3 +100,39 @@ func (p *PostController) Vote(postId string, vote *models.VoteStruct) {
 	p.Data["json"] = "success"
 	p.ServeJSON()
 }
+
+// Vote controller method
+// @Title Vote
+// @Description Retrieve vote counts by filtering either postID or userID
+// @Success 200 {int} count
+// @router /vote/count [get]
+func (p *PostController) VoteCount(postID, userID *string) {
+	var count int
+	if postID != nil {
+		count, _ = models.CountVotesByPost(bson.ObjectIdHex(*postID))
+	} else if userID != nil {
+		count, _ = models.CountVotesByUser(bson.ObjectIdHex(*userID))
+	}
+	
+	p.Data["json"] = count
+	p.ServeJSON()
+}
+
+// Vote controller method
+// @Title Vote
+// @Description Retrieve vote counts by filtering either postID or userID
+// @Success 200 {int} count
+// @router /vote/get [get]
+func (p *PostController) GetVotesBy(postID, userID *string) {
+	var res []bson.M
+	if postID != nil {
+		res, _ = models.GetVotesByPost(bson.ObjectIdHex(*postID))
+	} else {
+		voterID := p.Ctx.Input.Param("userID")
+		res, _ = models.GetVotesByUser(bson.ObjectIdHex(voterID))
+	}
+	
+	p.Data["json"] = res
+	p.ServeJSON()
+}
+

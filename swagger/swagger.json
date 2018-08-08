@@ -60,6 +60,48 @@
                 }
             }
         },
+        "/post/vote/count": {
+            "get": {
+                "tags": [
+                    "post"
+                ],
+                "description": "Retrieve vote counts by filtering either postID or userID",
+                "operationId": "PostController.Vote",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "postID",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} count"
+                    }
+                }
+            }
+        },
+        "/post/vote/get": {
+            "get": {
+                "tags": [
+                    "post"
+                ],
+                "description": "Retrieve vote counts by filtering either postID or userID",
+                "operationId": "PostController.Vote",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "postID",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} count"
+                    }
+                }
+            }
+        },
         "/post/{id}/vote": {
             "post": {
                 "tags": [
@@ -79,15 +121,15 @@
                     },
                     {
                         "in": "query",
-                        "name": "postId",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
                         "name": "vote",
                         "schema": {
                             "$ref": "#/definitions/models.VoteStruct"
                         }
+                    },
+                    {
+                        "in": "query",
+                        "name": "postID",
+                        "type": "string"
                     }
                 ],
                 "responses": {

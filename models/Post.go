@@ -157,7 +157,6 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	vote.PostID = postid
 	vote.VoterID = voterid
 	for _, o := range v.Options {
-		log.Println(o)
 		vote.Vote = append(vote.Vote, o.Name)
 	}
 	
@@ -166,4 +165,93 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 		return err
 	}
 	return nil
+}
+
+// GetVotesByUser
+func GetVotesByUser(userid bson.ObjectId) ([]bson.M, error) {
+	pipeline := []bson.M{
+		bson.M{"$match": bson.M{"from": userid}}, 
+        bson.M{"$lookup": bson.M{
+                            "from": voteCollection, 
+                            "foreignField": "voter_id",
+                            "localField":"_id",
+                            "as":"votes",
+                            },
+              },
+        }
+	
+	result := []bson.M{}    
+
+	if err := GetMongo().Find(collection, pipeline).All(&result); err != nil {
+		log.Printf("Error trying to get votes by user: %v", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+
+// GetVotesByPost
+func GetVotesByPost(userid bson.ObjectId) ([]bson.M, error) {
+	pipeline := []bson.M{
+		bson.M{"$match": bson.M{"from": userid}}, 
+        bson.M{"$lookup": bson.M{
+                            "from": voteCollection, 
+                            "foreignField": "post_id",
+                            "localField":"_id",
+                            "as":"votes",
+                            },
+              },
+        }
+	
+	result := []bson.M{}    
+
+	if err := GetMongo().Find(postCollection, pipeline).All(&result); err != nil {
+		log.Printf("Error trying to get votes by user: %v", err)
+		return nil, err
+	}
+	return result, nil
+}
+
+
+// CountVotesByUser
+func CountVotesByUser(userid bson.ObjectId) (int, error) {
+	pipeline := []bson.M{
+		bson.M{"$match": bson.M{"from": userid}}, 
+        bson.M{"$lookup": bson.M{
+                            "from": voteCollection, 
+                            "foreignField": "voter_id",
+                            "localField":"_id",
+                            "as":"votes",
+                            },
+              },
+        } 
+
+	n, err := GetMongo().Find(collection, pipeline).Count()
+	if err != nil {
+		log.Printf("Error trying to get votes by user: %v", err)
+	} 
+
+	return n, err
+}
+
+
+// CountVotesByPost
+func CountVotesByPost(postid bson.ObjectId) (int, error) {
+	pipeline := []bson.M{
+		bson.M{"$match": bson.M{"from": postid}}, 
+        bson.M{"$lookup": bson.M{
+                            "from": voteCollection, 
+                            "foreignField": "post_id",
+                            "localField":"_id",
+                            "as":"votes",
+                            },
+              },
+        }
+	
+		n, err := GetMongo().Find(postCollection, pipeline).Count()
+		if err != nil {
+			log.Printf("Error trying to get votes by user: %v", err)
+		} 
+
+		return n, err
 }

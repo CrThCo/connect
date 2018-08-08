@@ -25,12 +25,12 @@ paths:
         schema:
           $ref: '#/definitions/models.VoteStruct'
       - in: query
-        name: postId
-        type: string
-      - in: query
         name: vote
         schema:
           $ref: '#/definitions/models.VoteStruct'
+      - in: query
+        name: postID
+        type: string
       responses:
         "200":
           description: '{int} models.Vote.Id'
@@ -65,6 +65,32 @@ paths:
           description: '{int} models.Post.Id'
         "403":
           description: body is empty
+  /post/vote/count:
+    get:
+      tags:
+      - post
+      description: Retrieve vote counts by filtering either postID or userID
+      operationId: PostController.Vote
+      parameters:
+      - in: query
+        name: postID
+        type: string
+      responses:
+        "200":
+          description: '{int} count'
+  /post/vote/get:
+    get:
+      tags:
+      - post
+      description: Retrieve vote counts by filtering either postID or userID
+      operationId: PostController.Vote
+      parameters:
+      - in: query
+        name: postID
+        type: string
+      responses:
+        "200":
+          description: '{int} count'
   /user/:
     get:
       tags:
