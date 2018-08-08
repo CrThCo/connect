@@ -46,6 +46,7 @@ type Post struct {
 	Content   string        `bson:"content" json:"content"`
 	Hash      string        `bson:"hash" json:"hash"`
 	Image     string        `bson:"image" json:"image"`
+	Options []VoteOptions   `json:"options"`
 	Verified  bool          `bson:"verified" json:"verified"`
 	Poster    string        `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`

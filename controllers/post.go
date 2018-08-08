@@ -24,7 +24,6 @@ type PostController struct {
 func (p *PostController) NewPost() {
 	var post models.Post
 	userID := p.Ctx.Input.Param("userID")
-
 	if err := json.Unmarshal(p.Ctx.Input.RequestBody, &post); err != nil {
 		p.Ctx.Output.SetStatus(400)
 		p.Data["json"] = err.Error()
@@ -44,6 +43,17 @@ func (p *PostController) NewPost() {
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
 		return
+	}
+
+	// add votes if available
+	if len(post.Options) > 0 {
+		vs := &models.VoteStruct{Options: post.Options}
+		if err := vs.AddVote(post.ID, bson.ObjectIdHex(userID)); err != nil {
+			p.Ctx.Output.SetStatus(500)
+			p.Data["json"] = err.Error()
+			p.ServeJSON()
+			return
+		}
 	}
 	p.Data["json"] = post
 	p.ServeJSON()

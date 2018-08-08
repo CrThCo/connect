@@ -292,6 +292,12 @@
                 "image": {
                     "type": "string"
                 },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.VoteOptions"
+                    }
+                },
                 "poster": {
                     "type": "string"
                 },

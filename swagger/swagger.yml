@@ -192,6 +192,10 @@ definitions:
         $ref: '#/definitions/bson.ObjectId'
       image:
         type: string
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/models.VoteOptions'
       poster:
         type: string
       updated_at:
