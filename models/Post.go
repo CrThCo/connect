@@ -18,7 +18,7 @@ import (
 const (
 	postCollection = "posts"
 	voteCollection = "votes"
-	)
+)
 
 type VoteOptions struct {
 	Name string  `json:"name"`

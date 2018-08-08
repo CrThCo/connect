@@ -18,18 +18,7 @@ import (
 	"github.com/dghubble/gologin/twitter"
 	"github.com/dghubble/oauth1"
 	twitterOAuth1 "github.com/dghubble/oauth1/twitter"
-
-	"github.com/astaxie/beego/session"
 )
-
-// var sessionStore = sessions.NewCookieStore([]byte(sessionSecret), nil)
-
-var globalSessions *session.Manager
-
-func init() {
-    globalSessions, _ = session.NewManager("memory", &session.ManagerConfig{CookieName: "userId", EnableSetCookie: true, Gclifetime:3600, Maxlifetime: 3600, Secure: false, CookieLifeTime: 3600})
-    go globalSessions.GC()
-}
 
 func main() {
 	if beego.BConfig.RunMode == "dev" {
@@ -121,21 +110,11 @@ func issueSession() http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		
-		// session := sessionStore.New(sessionName)
-		// session.Values[sessionUserKey] = twitterUser.ID
-		// // session.Values[sessionUserName] = twitterUser.ScreenName
-		// session.Save(w)
-		sess, _ := globalSessions.SessionStart(w, req)
-		defer sess.SessionRelease(w)
 
 		if u, err := models.GetUserByEmail(twitterUser.Email); err != nil {
 			fmt.Printf("Error trying to get user by email: %v", err.Error())
 		} else if u == nil {
 			fmt.Printf("User not added yet: email=%v", twitterUser.Email)
-		} else if u != nil {
-			// session.Values[sessionUserID] = u.ID.String()
-			sess.Set("userId", u.ID.String())
 		} else {
 			// add user, if not already present
 		u := &models.User{
@@ -148,8 +127,6 @@ func issueSession() http.Handler {
 			fmt.Printf("Couldn't add user: email=%v, err=%v", twitterUser.Email, err)
 		}
 
-		// session.Values[sessionUserID] = u.ID.String()
-		sess.Set("userId", u.ID.String())
 		}
 
 		//TODO: redirect when it works

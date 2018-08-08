@@ -80,7 +80,7 @@ func (p *PostController) Vote(postId string, vote *models.VoteStruct) {
 	if !bson.IsObjectIdHex(postId) {
 		log.Printf("Post id is invalid: id=%v\n", postId)
 	}
-	voterId := p.GetSession("userId").(string)
+	voterId := p.Ctx.Input.Param("userID")
 	if err := vote.AddVote(bson.ObjectIdHex(postId), bson.ObjectIdHex(voterId)); err != nil {
 		p.Ctx.Output.SetStatus(500)
 		p.Data["json"] = err.Error()
