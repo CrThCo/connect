@@ -121,15 +121,15 @@
                     },
                     {
                         "in": "query",
+                        "name": "postID",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
                         "name": "vote",
                         "schema": {
                             "$ref": "#/definitions/models.VoteStruct"
                         }
-                    },
-                    {
-                        "in": "query",
-                        "name": "postID",
-                        "type": "string"
                     }
                 ],
                 "responses": {

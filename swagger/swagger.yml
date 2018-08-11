@@ -25,12 +25,12 @@ paths:
         schema:
           $ref: '#/definitions/models.VoteStruct'
       - in: query
+        name: postID
+        type: string
+      - in: query
         name: vote
         schema:
           $ref: '#/definitions/models.VoteStruct'
-      - in: query
-        name: postID
-        type: string
       responses:
         "200":
           description: '{int} models.Vote.Id'

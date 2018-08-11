@@ -120,6 +120,16 @@ func (p *Post) Insert() error {
 	return nil
 }
 
+// Update post
+func (p *Post) Update() error {
+	p.UpdatedAt = time.Now().UTC()
+	if err := GetMongo().UpdateByID(postCollection, p.ID.String(), p); err != nil {
+		return err
+	}
+	return nil
+
+}
+
 // GetByUser method
 func (p *Post) GetByUser() ([]*Post, error) {
 	var posts []*Post
@@ -163,7 +173,17 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	if err := GetMongo().Insert(voteCollection, v); err != nil {
 		log.Println(err)
 		return err
+	} 
+
+	// update post
+	if post, err := GetByID(postid.String()); err == nil {
+		post.VoteCount++
+		post.Update()
+	} else {
+		log.Println(err)
+		return err
 	}
+	
 	return nil
 }
 

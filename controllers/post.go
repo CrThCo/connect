@@ -54,6 +54,11 @@ func (p *PostController) NewPost() {
 			p.ServeJSON()
 			return
 		}
+		post.VoteCount = 1
+		if err := post.Update()	; err != nil {
+			log.Printf("Error updating user: %v", err)
+		}
+	
 	}
 	p.Data["json"] = post
 	p.ServeJSON()
@@ -96,7 +101,7 @@ func (p *PostController) Vote(postID string, vote *models.VoteStruct) {
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
 		return
-	}
+	} else
 	p.Data["json"] = "success"
 	p.ServeJSON()
 }
