@@ -101,7 +101,7 @@ func (p *PostController) Vote(postID string, vote *models.VoteStruct) {
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
 		return
-	} else
+	} 
 	p.Data["json"] = "success"
 	p.ServeJSON()
 }
