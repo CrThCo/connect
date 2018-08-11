@@ -150,7 +150,7 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	if len(v.Options) == 0 {
 		return errors.New("No vote options")
 	}
-	var vote *Vote
+	vote := &Vote{}
 	vote.Vote = make([]string, 0, len(v.Options))
 	vote.ID = bson.NewObjectId()
 	vote.CastedAt = time.Now().UTC()
