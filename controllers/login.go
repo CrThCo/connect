@@ -19,12 +19,14 @@ type LoginController struct {
 func (l *LoginController) getJWTToken(uid string) (string, error) {
 	h := md5.New()
 	currentTimestamp := time.Now().UTC().Unix()
+	expireAt := time.Now().Add(24 * time.Hour).UTC().Unix()
+
 	standardClaims := jwt.StandardClaims{
 		Subject:   uid,
 		IssuedAt:  currentTimestamp,
 		NotBefore: currentTimestamp,
 		// TODO: make it configurable for production
-		ExpiresAt: currentTimestamp + 13600,
+		ExpiresAt: expireAt,
 		//TODO: change in production - should be configurable
 		Issuer: l.Ctx.Input.Domain(),
 		Id:     fmt.Sprintf("%x", h.Sum(nil)),

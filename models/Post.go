@@ -21,23 +21,22 @@ const (
 )
 
 type VoteOptions struct {
-	Name string  `json:"name"`
+	Name  string `json:"name"`
 	Value string `json:"value"`
 }
 
 type VoteStruct struct {
 	Options []VoteOptions `json:"options"`
-	Image string `json:"image"`
-
+	Image   string        `json:"image"`
 }
 
-// Vote struct to store vote per 
+// Vote struct to store vote per
 type Vote struct {
 	ID       bson.ObjectId `bson:"_id" json:"id"`
 	PostID   bson.ObjectId `bson:"post_id" json:"vote_id"`
 	VoterID  bson.ObjectId `bson:"voter_id" json:"voter_id"`
-	Vote     []string    `bson:"votes" json:"votes"`
-	CastedAt time.Time `bson:"created_at" json:"created_at"`
+	Vote     []string      `bson:"votes" json:"votes"`
+	CastedAt time.Time     `bson:"created_at" json:"created_at"`
 }
 
 // Post struct to map post
@@ -46,7 +45,7 @@ type Post struct {
 	Content   string        `bson:"content" json:"content"`
 	Hash      string        `bson:"hash" json:"hash"`
 	Image     string        `bson:"image" json:"image"`
-	Options []VoteOptions   `json:"options"`
+	Options   []VoteOptions `json:"options"`
 	Verified  bool          `bson:"verified" json:"verified"`
 	Poster    string        `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`
@@ -123,7 +122,7 @@ func (p *Post) Insert() error {
 // Update post
 func (p *Post) Update() error {
 	p.UpdatedAt = time.Now().UTC()
-	if err := GetMongo().UpdateByID(postCollection, p.ID.String(), p); err != nil {
+	if err := GetMongo().UpdateByID(postCollection, p.ID.Hex(), p); err != nil {
 		return err
 	}
 	return nil
@@ -154,7 +153,7 @@ func GetByID(uid string) (*Post, error) {
 
 // Insert post
 func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
-	if (!postid.Valid() || !voterid.Valid()) {
+	if !postid.Valid() || !voterid.Valid() {
 		return errors.New("Post id or voter id not valid")
 	}
 	if len(v.Options) == 0 {
@@ -169,38 +168,38 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	for _, o := range v.Options {
 		vote.Vote = append(vote.Vote, o.Name)
 	}
-	
+
 	if err := GetMongo().Insert(voteCollection, v); err != nil {
 		log.Println(err)
 		return err
-	} 
+	}
 
 	// update post
-	if post, err := GetByID(postid.String()); err == nil {
+	if post, err := GetByID(postid.Hex()); err == nil {
 		post.VoteCount++
 		post.Update()
 	} else {
 		log.Println(err)
 		return err
 	}
-	
+
 	return nil
 }
 
 // GetVotesByUser
 func GetVotesByUser(userid bson.ObjectId) ([]bson.M, error) {
 	pipeline := []bson.M{
-		bson.M{"$match": bson.M{"from": userid}}, 
-        bson.M{"$lookup": bson.M{
-                            "from": voteCollection, 
-                            "foreignField": "voter_id",
-                            "localField":"_id",
-                            "as":"votes",
-                            },
-              },
-        }
-	
-	result := []bson.M{}    
+		bson.M{"$match": bson.M{"from": userid}},
+		bson.M{"$lookup": bson.M{
+			"from":         voteCollection,
+			"foreignField": "voter_id",
+			"localField":   "_id",
+			"as":           "votes",
+		},
+		},
+	}
+
+	result := []bson.M{}
 
 	if err := GetMongo().Find(collection, pipeline).All(&result); err != nil {
 		log.Printf("Error trying to get votes by user: %v", err)
@@ -209,21 +208,20 @@ func GetVotesByUser(userid bson.ObjectId) ([]bson.M, error) {
 	return result, nil
 }
 
-
 // GetVotesByPost
 func GetVotesByPost(userid bson.ObjectId) ([]bson.M, error) {
 	pipeline := []bson.M{
-		bson.M{"$match": bson.M{"from": userid}}, 
-        bson.M{"$lookup": bson.M{
-                            "from": voteCollection, 
-                            "foreignField": "post_id",
-                            "localField":"_id",
-                            "as":"votes",
-                            },
-              },
-        }
-	
-	result := []bson.M{}    
+		bson.M{"$match": bson.M{"from": userid}},
+		bson.M{"$lookup": bson.M{
+			"from":         voteCollection,
+			"foreignField": "post_id",
+			"localField":   "_id",
+			"as":           "votes",
+		},
+		},
+	}
+
+	result := []bson.M{}
 
 	if err := GetMongo().Find(postCollection, pipeline).All(&result); err != nil {
 		log.Printf("Error trying to get votes by user: %v", err)
@@ -232,46 +230,44 @@ func GetVotesByPost(userid bson.ObjectId) ([]bson.M, error) {
 	return result, nil
 }
 
-
 // CountVotesByUser
 func CountVotesByUser(userid bson.ObjectId) (int, error) {
 	pipeline := []bson.M{
-		bson.M{"$match": bson.M{"from": userid}}, 
-        bson.M{"$lookup": bson.M{
-                            "from": voteCollection, 
-                            "foreignField": "voter_id",
-                            "localField":"_id",
-                            "as":"votes",
-                            },
-              },
-        } 
+		bson.M{"$match": bson.M{"from": userid}},
+		bson.M{"$lookup": bson.M{
+			"from":         voteCollection,
+			"foreignField": "voter_id",
+			"localField":   "_id",
+			"as":           "votes",
+		},
+		},
+	}
 
 	n, err := GetMongo().Find(collection, pipeline).Count()
 	if err != nil {
 		log.Printf("Error trying to get votes by user: %v", err)
-	} 
+	}
 
 	return n, err
 }
 
-
 // CountVotesByPost
 func CountVotesByPost(postid bson.ObjectId) (int, error) {
 	pipeline := []bson.M{
-		bson.M{"$match": bson.M{"from": postid}}, 
-        bson.M{"$lookup": bson.M{
-                            "from": voteCollection, 
-                            "foreignField": "post_id",
-                            "localField":"_id",
-                            "as":"votes",
-                            },
-              },
-        }
-	
-		n, err := GetMongo().Find(postCollection, pipeline).Count()
-		if err != nil {
-			log.Printf("Error trying to get votes by user: %v", err)
-		} 
+		bson.M{"$match": bson.M{"from": postid}},
+		bson.M{"$lookup": bson.M{
+			"from":         voteCollection,
+			"foreignField": "post_id",
+			"localField":   "_id",
+			"as":           "votes",
+		},
+		},
+	}
 
-		return n, err
+	n, err := GetMongo().Find(postCollection, pipeline).Count()
+	if err != nil {
+		log.Printf("Error trying to get votes by user: %v", err)
+	}
+
+	return n, err
 }
