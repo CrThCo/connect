@@ -1,19 +1,18 @@
 package controllers
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
 	"log"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/MartinResearchSociety/connect/models"
 	"github.com/astaxie/beego"
-	
 )
 
 type PostController struct {
 	beego.Controller
 }
-
 
 // @Title CreatPost
 // @Description create new post
@@ -37,7 +36,7 @@ func (p *PostController) NewPost() {
 		p.ServeJSON()
 		return
 	}
-	post.Poster = userID
+	post.Poster = bson.ObjectIdHex(userID)
 	if err := post.Insert(); err != nil {
 		p.Ctx.Output.SetStatus(500)
 		p.Data["json"] = err.Error()
@@ -55,10 +54,10 @@ func (p *PostController) NewPost() {
 			return
 		}
 		post.VoteCount = 1
-		if err := post.Update()	; err != nil {
+		if err := post.Update(); err != nil {
 			log.Printf("Error updating user: %v", err)
 		}
-	
+
 	}
 	p.Data["json"] = post
 	p.ServeJSON()
@@ -83,7 +82,6 @@ func (p *PostController) GetByUser() {
 	p.ServeJSON()
 }
 
-
 // Vote controller method
 // @Title Vote
 // @Description Reterive user posts
@@ -101,7 +99,7 @@ func (p *PostController) Vote(postID string, vote *models.VoteStruct) {
 		p.Data["json"] = err.Error()
 		p.ServeJSON()
 		return
-	} 
+	}
 	p.Data["json"] = "success"
 	p.ServeJSON()
 }
@@ -118,7 +116,7 @@ func (p *PostController) VoteCount(postID, userID *string) {
 	} else if userID != nil {
 		count, _ = models.CountVotesByUser(bson.ObjectIdHex(*userID))
 	}
-	
+
 	p.Data["json"] = count
 	p.ServeJSON()
 }
@@ -136,8 +134,7 @@ func (p *PostController) GetVotesBy(postID, userID *string) {
 		voterID := p.Ctx.Input.Param("userID")
 		res, _ = models.GetVotesByUser(bson.ObjectIdHex(voterID))
 	}
-	
+
 	p.Data["json"] = res
 	p.ServeJSON()
 }
-

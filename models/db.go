@@ -14,8 +14,8 @@ import (
 type MongoConnection struct {
 	ConnectionString string
 	DatabaseName     string
-	MgoUser string
-	MgoPassword string
+	MgoUser          string
+	MgoPassword      string
 	Instance         *mgo.Database
 }
 
@@ -30,8 +30,8 @@ func GetMongo() *MongoConnection {
 		instance = &MongoConnection{
 			ConnectionString: beego.AppConfig.String("DBServer"),
 			DatabaseName:     beego.AppConfig.String("DBName"),
-			MgoUser: beego.AppConfig.String("MgoUser"),
-			MgoPassword: beego.AppConfig.String("MgoPassword"),
+			MgoUser:          beego.AppConfig.String("MgoUser"),
+			MgoPassword:      beego.AppConfig.String("MgoPassword"),
 		}
 		instance.Connect()
 	})
@@ -84,6 +84,11 @@ func (db *MongoConnection) Insert(collection string, document interface{}) error
 // Find Method
 func (db *MongoConnection) Find(collection string, filter interface{}) *mgo.Query {
 	return db.Instance.C(collection).Find(filter)
+}
+
+// Pipe method
+func (db *MongoConnection) Pipe(collection string, pipe interface{}) *mgo.Pipe {
+	return db.Instance.C(collection).Pipe(pipe)
 }
 
 // FindByID Method

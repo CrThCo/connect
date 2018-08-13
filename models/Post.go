@@ -19,6 +19,7 @@ const (
 	postCollection = "posts"
 	voteCollection = "votes"
 )
+
 // VoteOptions
 type VoteOptions struct {
 	Name  string `json:"name"`
@@ -48,12 +49,11 @@ type Post struct {
 	Image     string        `bson:"image" json:"image"`
 	Options   []VoteOptions `json:"options"`
 	Verified  bool          `bson:"verified" json:"verified"`
-	Poster    string        `bson:"poster" json:"poster"`
+	Poster    bson.ObjectId `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
-
 
 // SaveImage method
 func (p *Post) SaveImage() error {
@@ -134,18 +134,19 @@ func (p *Post) Update() error {
 // GetByUser method
 func (p *Post) GetByUser() (*[]bson.M, error) {
 	pipeline := []bson.M{
-		bson.M{"$lookup": bson.M{
-			"from":         collection,
-			"foreignField": "_id",
-			"localField":   "poster",
-			"as":           "user",
-		},
+		bson.M{
+			"$lookup": bson.M{
+				"from":         collection,
+				"foreignField": "_id",
+				"localField":   "poster",
+				"as":           "user",
+			},
 		},
 	}
 
 	result := []bson.M{}
 
-	if err := GetMongo().Find(postCollection, pipeline).All(&result); err != nil {
+	if err := GetMongo().Pipe(postCollection, pipeline).All(&result); err != nil {
 		log.Printf("Error trying to get votes by user: %v", err)
 		return nil, err
 	}
