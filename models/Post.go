@@ -142,6 +142,9 @@ func (p *Post) GetByUser() (*[]bson.M, error) {
 				"as":           "user",
 			},
 		},
+		bson.M{
+			"$sort": bson.M{"_id": -1},
+		},
 	}
 
 	result := []bson.M{}
