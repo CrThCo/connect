@@ -19,12 +19,13 @@ const (
 	postCollection = "posts"
 	voteCollection = "votes"
 )
-
+// VoteOptions
 type VoteOptions struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
 
+// VoteStruct
 type VoteStruct struct {
 	Options []VoteOptions `json:"options"`
 	Image   string        `json:"image"`
@@ -52,6 +53,7 @@ type Post struct {
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
+
 
 // SaveImage method
 func (p *Post) SaveImage() error {
@@ -130,14 +132,31 @@ func (p *Post) Update() error {
 }
 
 // GetByUser method
-func (p *Post) GetByUser() ([]*Post, error) {
-	var posts []*Post
-	err := GetMongo().Find(postCollection, nil).Sort("-$natural").All(&posts)
-	if err != nil {
-		log.Printf("Post -> GetByUser %v", err)
-		return nil, errors.New("unable to reterive posts for user")
+func (p *Post) GetByUser() (*[]bson.M, error) {
+	pipeline := []bson.M{
+		bson.M{"$lookup": bson.M{
+			"from":         collection,
+			"foreignField": "_id",
+			"localField":   "poster",
+			"as":           "user",
+		},
+		},
 	}
-	return posts, nil
+
+	result := []bson.M{}
+
+	if err := GetMongo().Find(postCollection, pipeline).All(&result); err != nil {
+		log.Printf("Error trying to get votes by user: %v", err)
+		return nil, err
+	}
+	return &result, nil
+	// var posts []*Post
+	// err := GetMongo().Find(postCollection, nil).Sort("-$natural").All(&posts)
+	// if err != nil {
+	// 	log.Printf("Post -> GetByUser %v", err)
+	// 	return nil, errors.New("unable to reterive posts for user")
+	// }
+	// return posts, nil
 }
 
 // GetByID function
@@ -151,7 +170,7 @@ func GetByID(uid string) (*Post, error) {
 	return post, nil
 }
 
-// Insert post
+// AddVote
 func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	if !postid.Valid() || !voterid.Valid() {
 		return errors.New("Post id or voter id not valid")
