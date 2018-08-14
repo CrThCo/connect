@@ -159,6 +159,14 @@
                 }
             }
         },
+        "/user/download": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "operationId": "UserController.DownloadFile"
+            }
+        },
         "/user/login": {
             "post": {
                 "tags": [
@@ -230,6 +238,15 @@
                         "description": "body is empty"
                     }
                 }
+            }
+        },
+        "/user/upload": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "upload user image",
+                "operationId": "UserController.Upload"
             }
         },
         "/user/{uid}": {
@@ -341,7 +358,7 @@
                     }
                 },
                 "poster": {
-                    "type": "string"
+                    "$ref": "#/definitions/bson.ObjectId"
                 },
                 "updated_at": {
                     "type": "string",

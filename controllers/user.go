@@ -110,3 +110,27 @@ func (u *UserController) Put() {
 	u.Data["json"] = uu
 	u.ServeJSON()
 }
+
+
+// @Title Upload
+// @Description upload user image
+// @router /upload [post]
+func (u *UserController) Upload() {
+	f, h, _ := u.GetFile("file")  
+	path := beego.AppConfig.String("FileStoragePath") + h.Filename   
+	f.Close()                          
+	if err := u.SaveToFile("file", path); err != nil {
+		u.Ctx.Output.SetStatus(500)
+		u.Data["json"] = err.Error()
+		u.ServeJSON()
+		return
+	} 
+}
+
+// @Title DownloadFile
+// @router /download [get]
+func (u *UserController) DownloadFile() {
+	filename := u.GetString("file")
+	path := beego.AppConfig.String("FileStoragePath") + filename
+	u.Ctx.Output.Download(path)
+}
