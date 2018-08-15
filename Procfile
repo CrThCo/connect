@@ -1,1 +1,1 @@
-web: connect-api-prod
+web: ./connect

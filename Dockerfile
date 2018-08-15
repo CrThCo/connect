@@ -16,4 +16,4 @@ ADD . $APP_DIR
 # Compile the binary and statically link
 RUN cd $APP_DIR && CGO_ENABLED=0 godep go build -ldflags '-d -w -s'
 
-EXPOSE 8080
+EXPOSE 8030
