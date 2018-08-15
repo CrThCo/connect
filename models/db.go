@@ -12,11 +12,8 @@ import (
 
 // MongoConnection struct
 type MongoConnection struct {
-	ConnectionString string
-	DatabaseName     string
-	MgoUser          string
-	MgoPassword      string
-	Instance         *mgo.Database
+	DailInfo *mgo.DialInfo
+	Instance *mgo.Database
 }
 
 var (
@@ -27,11 +24,14 @@ var (
 // GetMongo function return the MongoConnection reference
 func GetMongo() *MongoConnection {
 	once.Do(func() {
+		info, err := mgo.ParseURL(beego.AppConfig.String("MONGODB_URI"))
+		if err != nil {
+			log.Fatalln("Invalid MONGODB_URI")
+
+		}
+
 		instance = &MongoConnection{
-			ConnectionString: beego.AppConfig.String("DBServer"),
-			DatabaseName:     beego.AppConfig.String("DBName"),
-			MgoUser:          beego.AppConfig.String("MgoUser"),
-			MgoPassword:      beego.AppConfig.String("MgoPassword"),
+			DailInfo: info,
 		}
 		instance.Connect()
 	})
@@ -54,7 +54,7 @@ func (db *MongoConnection) Connect() {
 	// 	break
 	// }
 	for {
-		session, err := mgo.Dial(db.ConnectionString)
+		session, err := mgo.DialWithInfo(db.DailInfo)
 
 		if err != nil {
 			log.Printf("Mongo Connection Error:: %v", err)
@@ -65,12 +65,12 @@ func (db *MongoConnection) Connect() {
 		}
 		log.Println("Connection established with mongodb!")
 
-		db.Instance = session.DB(db.DatabaseName)
+		db.Instance = session.DB("")
 		//TODO: should be an env variable
-		err = db.Instance.Login(db.MgoUser, db.MgoPassword)
-		if err != nil {
-			log.Printf("Mongo login failed:: %v", err)
-		}
+		// err = db.Instance.Login(db.MgoUser, db.MgoPassword)
+		// if err != nil {
+		// 	log.Printf("Mongo login failed:: %v", err)
+		// }
 		break
 	}
 
