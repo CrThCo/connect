@@ -23,3 +23,9 @@
 #   non-go = false
 #   go-tests = true
 #   unused-packages = true
+[metadata.heroku]
+  root-package = "github.com/heroku/fixture"
+  go-version = "go1.8.3"
+  install = [ "./cmd/...", "./foo" ]
+  ensure = "true"
+  additional-tools = []
