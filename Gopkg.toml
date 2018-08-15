@@ -27,5 +27,5 @@
   root-package = "github.com/heroku/fixture"
   go-version = "go1.9"
   install = [ "./cmd/..."]
-  ensure = "true"
+  ensure = "false"
   additional-tools = []
