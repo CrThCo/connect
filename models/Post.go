@@ -146,9 +146,7 @@ func (p *Post) GetByUser() (*[]bson.M, error) {
 			"$sort": bson.M{"_id": -1},
 		},
 	}
-
 	result := []bson.M{}
-
 	if err := GetMongo().Pipe(postCollection, pipeline).All(&result); err != nil {
 		log.Printf("Error trying to get votes by user: %v", err)
 		return nil, err
