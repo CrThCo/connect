@@ -145,6 +145,11 @@ paths:
             $ref: '#/definitions/models.User'
         "403":
           description: :uid is not int
+  /user/download:
+    get:
+      tags:
+      - user
+      operationId: UserController.DownloadFile
   /user/login:
     post:
       tags:
@@ -192,6 +197,12 @@ paths:
           description: '{string} models.JWT'
         "403":
           description: body is empty
+  /user/upload:
+    post:
+      tags:
+      - user
+      description: upload user image
+      operationId: UserController.Upload
 definitions:
   bson.ObjectId:
     type: object
@@ -223,7 +234,7 @@ definitions:
         items:
           $ref: '#/definitions/models.VoteOptions'
       poster:
-        type: string
+        $ref: '#/definitions/bson.ObjectId'
       updated_at:
         type: string
         format: string

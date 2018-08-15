@@ -98,8 +98,24 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
 		beego.ControllerComments{
+			Method: "DownloadFile",
+			Router: `/download`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
+		beego.ControllerComments{
 			Method: "Post",
 			Router: `/signup`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/MartinResearchSociety/connect/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "Upload",
+			Router: `/upload`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})

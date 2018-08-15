@@ -152,13 +152,6 @@ func (p *Post) GetByUser() (*[]bson.M, error) {
 		return nil, err
 	}
 	return &result, nil
-	// var posts []*Post
-	// err := GetMongo().Find(postCollection, nil).Sort("-$natural").All(&posts)
-	// if err != nil {
-	// 	log.Printf("Post -> GetByUser %v", err)
-	// 	return nil, errors.New("unable to reterive posts for user")
-	// }
-	// return posts, nil
 }
 
 // GetByID function
