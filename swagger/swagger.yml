@@ -243,6 +243,10 @@ definitions:
       vote_count:
         type: integer
         format: int64
+      votes:
+        additionalProperties:
+          type: integer
+          format: int64
   models.SocialMedia:
     title: SocialMedia
     type: object

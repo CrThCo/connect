@@ -51,6 +51,7 @@ type Post struct {
 	Verified  bool          `bson:"verified" json:"verified"`
 	Poster    bson.ObjectId `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`
+	VoteStats map[string]int `bson:"votes" json:"votes"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
@@ -191,11 +192,16 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	// update post
 	if post, err := GetByID(postid.Hex()); err == nil {
 		post.VoteCount++
+		for _, o := range v.Options {
+			post.VoteStats[o.Name]++
+		}
 		post.Update()
 	} else {
 		log.Println(err)
 		return err
 	}
+
+
 
 	return nil
 }
