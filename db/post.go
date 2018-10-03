@@ -169,6 +169,8 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 		post.VoteStats[o.Name]++
 		vote.Vote = append(vote.Vote, o.Name)
 	}
+	post.VoteCount++
+	post.Update()
 
 	if err := GetMongo().Insert(voteCollection, vote); err != nil {
 		log.Println(err)
