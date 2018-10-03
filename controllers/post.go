@@ -50,13 +50,14 @@ func (p *PostController) New(c *gin.Context) {
 			})
 			return
 		}
-		post.VoteCount = 1
-		if err := post.Update(); err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
+		// post.VoteCount = 1
+
+		// if err := post.Update(); err != nil {
+		// 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+		// 		"message": err.Error(),
+		// 	})
+		// 	return
+		// }
 	}
 	c.JSONP(http.StatusCreated, gin.H{
 		"message": "success",

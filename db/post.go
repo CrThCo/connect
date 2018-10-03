@@ -51,6 +51,7 @@ type Post struct {
 	Verified  bool          `bson:"verified" json:"verified"`
 	Poster    bson.ObjectId `bson:"poster" json:"poster"`
 	VoteCount int           `bson:"vote_count" json:"vote_count"`
+	VoteStats map[string]int `bson:"votes" json:"votes"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
@@ -157,7 +158,15 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 	vote.CastedAt = time.Now().UTC()
 	vote.PostID = postid
 	vote.VoterID = voterid
+
+	// get associated post
+	post, err := GetByID(postid.Hex())
+	if err != nil {
+		log.Printf("Can't get associated post with id %v: %v", postid, err)
+		return err
+	}
 	for _, o := range v.Options {
+		post.VoteStats[o.Name]++
 		vote.Vote = append(vote.Vote, o.Name)
 	}
 
@@ -165,15 +174,10 @@ func (v *VoteStruct) AddVote(postid, voterid bson.ObjectId) error {
 		log.Println(err)
 		return err
 	}
-
-	// update post
-	if post, err := GetByID(postid.Hex()); err == nil {
-		post.VoteCount++
-		post.Update()
-	} else {
-		log.Println(err)
-		return err
-	}
+	
+	// update post in case of no errors inserting a vote
+	post.VoteCount++
+	post.Update()
 
 	return nil
 }
